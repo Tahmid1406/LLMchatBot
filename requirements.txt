@@ -1,0 +1,14 @@
+streamlit
+langchain
+langchain-community
+openai
+faiss-cpu
+pypdf
+fastapi
+uvicorn
+langchain
+langchain-community
+chromadb
+pypdf
+ollama
+
