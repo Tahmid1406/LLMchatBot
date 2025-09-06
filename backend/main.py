@@ -81,26 +81,27 @@ async def upload_pdfs(files: list[UploadFile]):
 # -------------------
 @app.post("/chat")
 async def chat(question: str = Form(...)):
-    global qa_chain, llm, retriever
+    global qa_chain, retriever, llm
 
-    if qa_chain:
-        # Step 1: Try retrieving docs
+    if qa_chain:  # If PDFs were uploaded
+        # Try to retrieve relevant chunks
         docs = retriever.get_relevant_documents(question)
 
         if not docs or len(docs) == 0:
-            # Step 2: No docs → use base LLM
+            # No useful docs → fall back to base LLM
             answer = llm.invoke(question)
             return {"answer": answer, "sources": []}
 
-        # Step 3: Run RAG chain
+        # Docs found → use RAG chain
         result = qa_chain({"question": question})
         return {
             "answer": result["answer"],
             "sources": [doc.metadata.get("source", "Unknown") for doc in result.get("source_documents", [])]
         }
 
-    # Fallback: no PDFs uploaded at all
+    # No PDFs uploaded yet → base LLM
     answer = llm.invoke(question)
     return {"answer": answer, "sources": []}
+
 
 
